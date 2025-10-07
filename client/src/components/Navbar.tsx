@@ -76,7 +76,7 @@ export default function Navbar({ user, onLogout }: NavbarProps) {
             ) : (
               <>
                 <Link href="/login" data-testid="link-login">
-                  <Button variant="ghost" size="sm">
+                  <Button variant="outline" size="sm">
                     Login
                   </Button>
                 </Link>
