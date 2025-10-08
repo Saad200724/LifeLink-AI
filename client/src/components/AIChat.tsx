@@ -36,8 +36,8 @@ export default function AIChat({ messages: initialMessages, onSendMessage }: AIC
   const messagesEndRef = null; // Placeholder for actual ref
 
   const triageMutation = useMutation({
-    mutationFn: async (prompt: string) => {
-      const res = await apiRequest("POST", "/api/triage", { prompt });
+    mutationFn: async (symptoms: string) => {
+      const res = await apiRequest("POST", "/api/triage", { symptoms });
       return await res.json() as TriageResponse;
     },
     onSuccess: (data, symptoms) => {
