@@ -1,36 +1,40 @@
 import { useLocation } from "wouter";
 import { useUser } from "@/contexts/UserContext";
 import { useToast } from "@/hooks/use-toast";
+import { useMutation } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 import AuthForm from "@/components/AuthForm";
+import type { User } from "@shared/schema";
 
 export default function Login() {
   const [, setLocation] = useLocation();
   const { setUser } = useUser();
   const { toast } = useToast();
 
-  const handleLogin = (data: { email: string; password: string }) => {
-    const usersData = localStorage.getItem('lifelink_users');
-    const users = usersData ? JSON.parse(usersData) : [];
-    
-    const user = users.find((u: any) => u.email === data.email && u.password === data.password);
-    
-    if (user) {
-      const userWithoutPassword = { ...user, password: undefined };
-      setUser(userWithoutPassword);
-      localStorage.setItem('lifelink_current_user', JSON.stringify(userWithoutPassword));
-      
+  const loginMutation = useMutation({
+    mutationFn: async (data: { email: string; password: string }) => {
+      const res = await apiRequest("POST", "/api/auth/login", data);
+      return await res.json() as { user: User };
+    },
+    onSuccess: (response) => {
+      setUser(response.user);
       toast({
         title: "Login successful",
         description: "Welcome back!",
       });
       setLocation("/dashboard");
-    } else {
+    },
+    onError: (error: Error) => {
       toast({
         title: "Login failed",
-        description: "Invalid email or password",
+        description: error.message || "Invalid email or password",
         variant: "destructive",
       });
-    }
+    },
+  });
+
+  const handleLogin = (data: { email: string; password: string }) => {
+    loginMutation.mutate(data);
   };
 
   return <AuthForm mode="login" onSubmit={handleLogin} />;
