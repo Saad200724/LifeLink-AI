@@ -37,11 +37,8 @@ export default function AIChat({ messages: initialMessages, onSendMessage }: AIC
 
   const triageMutation = useMutation({
     mutationFn: async (symptoms: string) => {
-      return await apiRequest<TriageResponse>("/api/triage", {
-        method: "POST",
-        body: JSON.stringify({ symptoms }),
-        headers: { "Content-Type": "application/json" },
-      });
+      const res = await apiRequest("POST", "/api/triage", { symptoms });
+      return await res.json() as TriageResponse;
     },
     onSuccess: (data, symptoms) => {
       const firstAidText = data.first_aid?.join("\n• ") || "No specific first aid recommended";
