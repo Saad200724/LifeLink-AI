@@ -10,10 +10,31 @@ interface UserContextType {
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export function UserProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem("user");
-    return stored ? JSON.parse(stored) : null;
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // Check if there's a valid backend session on mount
+    fetch("/api/auth/me", { credentials: "include" })
+      .then(res => {
+        if (res.ok) {
+          return res.json();
+        }
+        throw new Error("Not authenticated");
+      })
+      .then(data => {
+        setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
+      })
+      .catch(() => {
+        // No valid session, clear localStorage
+        setUser(null);
+        localStorage.removeItem("user");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
+  }, []);
 
   useEffect(() => {
     if (user) {
@@ -22,6 +43,10 @@ export function UserProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem("user");
     }
   }, [user]);
+
+  if (loading) {
+    return null; // Or a loading spinner
+  }
 
   const logout = async () => {
     try {
