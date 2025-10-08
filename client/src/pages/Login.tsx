@@ -34,7 +34,11 @@ export default function Login() {
   });
 
   const handleLogin = (data: { email: string; password: string }) => {
-    loginMutation.mutate(data);
+    console.log("Attempting login with:", { email: data.email, password: "***" });
+    loginMutation.mutate({
+      email: data.email.trim(),
+      password: data.password
+    });
   };
 
   return <AuthForm mode="login" onSubmit={handleLogin} />;
