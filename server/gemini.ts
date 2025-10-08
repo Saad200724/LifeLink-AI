@@ -1,7 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { TriageResponse } from "@shared/schema";
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+const ai = new GoogleGenAI({ apiKey: process.env.GOOGLE_API_KEY || "" });
 
 const CRITICAL_KEYWORDS = [
   "unconscious", "not breathing", "no pulse", "severe bleeding",
