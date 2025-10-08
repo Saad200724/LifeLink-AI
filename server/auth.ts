@@ -10,6 +10,12 @@ export async function comparePassword(password: string, hash: string): Promise<b
 }
 
 export function requireAuth(req: Request, res: Response, next: NextFunction) {
+  console.log("[AUTH] Session check:", { 
+    sessionID: req.sessionID,
+    userId: req.session?.userId,
+    hasSession: !!req.session 
+  });
+  
   if (!req.session?.userId) {
     return res.status(401).json({ error: "Authentication required" });
   }
